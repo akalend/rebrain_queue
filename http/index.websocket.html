@@ -1,0 +1,86 @@
+<html>
+<head>
+    <script type="text/javascript" src="jquery.1.8.3.min.js" charset="utf-8"></script>
+
+<script>
+var ws = null;
+  var id = Math.floor(Math.random() * 10000)
+  $(document).ready(function(){
+      $("#gen_id").text(id);
+      $("#text").prop("value",id);
+  });
+
+function connect() {
+  if (ws !== null) return log('already connected');
+  ws = new WebSocket('ws://127.0.0.1:8080/ws/');
+  ws.onopen = function () {
+    log('connected');
+    send();
+  
+  };
+  ws.onerror = function (error) {
+    log(error);
+  };
+  ws.onmessage = function (e) {
+    log('recv: ' + e.data);
+    if (e.data[0] == '1') {
+        $('#info').show();    
+    };
+  };
+  ws.onclose = function () {
+    log('disconnected');
+    ws = null;
+  };
+  return false;
+}
+function disconnect() {
+  if (ws === null) return log('already disconnected');
+  ws.close();
+  return false;
+}
+function send() {
+
+
+      $.get("/start?id="+id, function(responce){
+        $('#startBtn').prop('disabled', true);
+        console.log(responce);
+        // console.log('responce' + " " + responce.status)
+      })
+
+
+  if (ws === null) return log('please connect first');
+  var text = document.getElementById('text').value;
+  document.getElementById('text').value = "";
+  log('send: ' + text);
+  ws.send(text);
+  return false;
+}
+
+
+
+function log(text) {
+  var li = document.createElement('li');
+  li.appendChild(document.createTextNode(text));
+  document.getElementById('log').appendChild(li);
+  return false;
+}
+</script>
+</head>
+<body>
+  <h4>id=<span id="gen_id"></span></h4>
+  <form onsubmit="return send();">
+    <button type="button" onclick="return connect();">
+      Connect
+    </button>
+    <button type="button" onclick="return disconnect();">
+      Disconnect
+    </button>
+    <input id="text" type="text" >
+    <button type="submit">Send</button>
+ 
+
+  </form>
+    <div id="info" style="display:none; color:red; font-weight: 600; font-size: 16pt;">Ваш процесс выполнился</div> 
+  <ol id="log"></ol>
+</body>
+</html>
