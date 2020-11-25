@@ -5,14 +5,10 @@ import aioredis
 
 async def handle_start(request):
     params = request.rel_url.query
-    # session = aiohttp.ClientSession()
     id = params['id']
     print('start parms=',id)
     redis = await aioredis.create_redis_pool('redis://127.0.0.1')
     await redis.lpush("queue", id)
-
-    # await redis.subscribe(id)
-
     redis.close()
     await redis.wait_closed()
 

@@ -9,7 +9,9 @@ channel = connection.channel()
 
 def callback(ch, method, properties, body):
     print(" [x] Received %r" % body)
+    # начало работы
     time.sleep(5)
+    # окончание работы
     filename = '/tmp/status/' + body.decode()
     fd = open(filename, 'w')
     fd.write("1")
